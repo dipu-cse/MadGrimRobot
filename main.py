@@ -33,7 +33,7 @@ def index():
             query = query.filter(Transaction.date <= end_datetime + datetime.timedelta(days=1))
         
         transactions = query.order_by(Transaction.date.desc()).all()
-    total_income = sum([t.amount for t in transactions if t.type == 'income'])
+        total_income = sum([t.amount for t in transactions if t.type == 'income'])
         total_expense = sum([t.amount for t in transactions if t.type == 'expense'])
         total = total_income - total_expense
         
