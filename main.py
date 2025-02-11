@@ -1,7 +1,7 @@
 
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///accounting.db'
@@ -30,7 +30,7 @@ def index():
             query = query.filter(Transaction.date >= start_datetime)
         if end_date and end_date.strip():
             end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
-            query = query.filter(Transaction.date <= end_datetime + datetime.timedelta(days=1))
+            query = query.filter(Transaction.date <= end_datetime + timedelta(days=1))
         
         transactions = query.order_by(Transaction.date.desc()).all()
         total_income = sum([t.amount for t in transactions if t.type == 'income'])
