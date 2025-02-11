@@ -93,6 +93,49 @@
             transition: background 0.3s;
         }
         .pagination a:hover { background: #f0fdf4; }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .income-card { border-bottom: 4px solid #22c55e; }
+        .expense-card { border-bottom: 4px solid #ef4444; }
+        .balance-card { border-bottom: 4px solid #3b82f6; }
     </style>
 </head>
 <body>
@@ -100,8 +143,26 @@
         <h1>Accounting App</h1>
         <a href="/logout" class="logout-btn">Logout</a>
     </div>
-    
+
     {% if session['user_id'] and current_user.is_admin %}
+    <div class="stats-container">
+        <div class="stat-card income-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Total Income</div>
+            <div class="stat-value">৳{{ "%.2f"|format(total_income) }}</div>
+        </div>
+        <div class="stat-card expense-card">
+            <div class="stat-icon">💸</div>
+            <div class="stat-label">Total Expenses</div>
+            <div class="stat-value">৳{{ "%.2f"|format(total_expense) }}</div>
+        </div>
+        <div class="stat-card balance-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-label">Total Balance</div>
+            <div class="stat-value">৳{{ "%.2f"|format(total) }}</div>
+        </div>
+    </div>
+    {% endif %}
     <div class="card">
         <h2>Add Transaction</h2>
         <form action="/add" method="post" class="form" style="margin-top: 1rem;">
@@ -117,13 +178,7 @@
     </div>
     {% endif %}
 
-    {% if session['user_id'] and current_user.is_admin %}
-    <div class="total">
-        <div>Total Income: ৳{{ "%.2f"|format(total_income) }}</div>
-        <div>Total Expenses: ৳{{ "%.2f"|format(total_expense) }}</div>
-        <div>Total Balance: ৳{{ "%.2f"|format(total) }}</div>
-    </div>
-    {% endif %}
+    
 
     <div class="card">
         <h3>Filter by Date</h3>
