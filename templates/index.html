@@ -29,9 +29,9 @@
     </div>
 
     <div class="total">
-        <div>Total Income: ${{ "%.2f"|format(total_income) }}</div>
-        <div>Total Expenses: ${{ "%.2f"|format(total_expense) }}</div>
-        <div>Total Balance: ${{ "%.2f"|format(total) }}</div>
+        <div>Total Income: ৳{{ "%.2f"|format(total_income) }}</div>
+        <div>Total Expenses: ৳{{ "%.2f"|format(total_expense) }}</div>
+        <div>Total Balance: ৳{{ "%.2f"|format(total) }}</div>
     </div>
 
     <h2>Transactions</h2>
@@ -39,7 +39,7 @@
     <div class="transaction {{ transaction.type }}">
         <strong>{{ transaction.description }}</strong>
         <br>
-        Amount: ${{ "%.2f"|format(transaction.amount) }}
+        Amount: ৳{{ "%.2f"|format(transaction.amount) }}
         <br>
         Date: {{ transaction.date.strftime('%Y-%m-%d %H:%M') }}
         <br>
