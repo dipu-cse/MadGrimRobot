@@ -118,11 +118,13 @@ def add_transaction():
     description = request.form['description']
     amount = float(request.form['amount'])
     type = request.form['type']
+    date = datetime.strptime(request.form['date'], '%Y-%m-%d')
     
     transaction = Transaction(
         description=description,
         amount=amount,
         type=type,
+        date=date,
         user_id=session['user_id']
     )
     db.session.add(transaction)

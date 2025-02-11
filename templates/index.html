@@ -101,6 +101,22 @@
         <a href="/logout" class="logout-btn">Logout</a>
     </div>
     
+    {% if session['user_id'] and current_user.is_admin %}
+    <div class="card">
+        <h2>Add Transaction</h2>
+        <form action="/add" method="post" class="form" style="margin-top: 1rem;">
+            <input type="text" name="description" placeholder="Description" required>
+            <input type="number" name="amount" step="0.01" placeholder="Amount" required>
+            <input type="date" name="date" required>
+            <select name="type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+            <button type="submit">Add</button>
+        </form>
+    </div>
+    {% endif %}
+
     <div class="card">
         <h3>Filter by Date</h3>
         <form method="get" class="form" style="margin-top: 1rem;">
@@ -110,21 +126,6 @@
             <a href="/" class="logout-btn" style="text-align: center">Reset</a>
         </form>
     </div>
-
-    {% if session['user_id'] and current_user.is_admin %}
-    <div class="card">
-        <h2>Add Transaction</h2>
-        <form action="/add" method="post" class="form" style="margin-top: 1rem;">
-            <input type="text" name="description" placeholder="Description" required>
-            <input type="number" name="amount" step="0.01" placeholder="Amount" required>
-            <select name="type">
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-            </select>
-            <button type="submit">Add</button>
-        </form>
-    </div>
-    {% endif %}
 
     <div class="total">
         <div>Total Income: ৳{{ "%.2f"|format(total_income) }}</div>
