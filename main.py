@@ -1,11 +1,39 @@
 
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
+from functools import wraps
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///accounting.db'
+app.config['SECRET_KEY'] = 'your-secret-key'  # Change this to a secure secret key
 db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    transactions = db.relationship('Transaction', backref='user', lazy=True)
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            return redirect(url_for('login'))
+        if not User.query.get(session['user_id']).is_admin:
+            flash('Admin access required')
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -13,11 +41,28 @@ class Transaction(db.Model):
     description = db.Column(db.String(100), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     type = db.Column(db.String(10), nullable=False)  # 'income' or 'expense'
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 with app.app_context():
     db.create_all()
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        user = User.query.filter_by(username=request.form['username']).first()
+        if user and user.password == request.form['password']:  # In production, use proper password hashing
+            session['user_id'] = user.id
+            return redirect(url_for('index'))
+        flash('Invalid credentials')
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect(url_for('login'))
+
 @app.route('/')
+@login_required
 def index():
     try:
         page = request.args.get('page', 1, type=int)
@@ -47,12 +92,18 @@ def index():
         return f"An error occurred: {str(e)}", 500
 
 @app.route('/add', methods=['POST'])
+@admin_required
 def add_transaction():
     description = request.form['description']
     amount = float(request.form['amount'])
     type = request.form['type']
     
-    transaction = Transaction(description=description, amount=amount, type=type)
+    transaction = Transaction(
+        description=description,
+        amount=amount,
+        type=type,
+        user_id=session['user_id']
+    )
     db.session.add(transaction)
     db.session.commit()
     
