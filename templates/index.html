@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Accounting App</title>
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .transaction { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+        .income { background-color: #e6ffe6; }
+        .expense { background-color: #ffe6e6; }
+        .form { margin: 20px 0; }
+        .total { font-size: 1.2em; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Accounting App</h1>
+    
+    <div class="form">
+        <h2>Add Transaction</h2>
+        <form action="/add" method="post">
+            <input type="text" name="description" placeholder="Description" required>
+            <input type="number" name="amount" step="0.01" placeholder="Amount" required>
+            <select name="type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+            <button type="submit">Add</button>
+        </form>
+    </div>
+
+    <div class="total">
+        Total Balance: ${{ "%.2f"|format(total) }}
+    </div>
+
+    <h2>Transactions</h2>
+    {% for transaction in transactions %}
+    <div class="transaction {{ transaction.type }}">
+        <strong>{{ transaction.description }}</strong>
+        <br>
+        Amount: ${{ "%.2f"|format(transaction.amount) }}
+        <br>
+        Date: {{ transaction.date.strftime('%Y-%m-%d %H:%M') }}
+        <br>
+        Type: {{ transaction.type }}
+    </div>
+    {% endfor %}
+</body>
+</html>
