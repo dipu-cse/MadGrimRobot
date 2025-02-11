@@ -20,6 +20,7 @@ with app.app_context():
 @app.route('/')
 def index():
     try:
+        page = request.args.get('page', 1, type=int)
         start_date = request.args.get('start_date')
         end_date = request.args.get('end_date')
         
@@ -32,14 +33,16 @@ def index():
             end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
             query = query.filter(Transaction.date <= end_datetime + timedelta(days=1))
         
-        transactions = query.order_by(Transaction.date.desc()).all()
-        total_income = sum([t.amount for t in transactions if t.type == 'income'])
-        total_expense = sum([t.amount for t in transactions if t.type == 'expense'])
+        pagination = query.order_by(Transaction.date.desc()).paginate(page=page, per_page=10, error_out=False)
+        transactions = pagination.items
+        total_income = sum([t.amount for t in query.filter_by(type='income').all()])
+        total_expense = sum([t.amount for t in query.filter_by(type='expense').all()])
         total = total_income - total_expense
         
         return render_template('index.html', transactions=transactions, total=total,
                              total_income=total_income, total_expense=total_expense,
-                             start_date=start_date, end_date=end_date)
+                             start_date=start_date, end_date=end_date,
+                             pagination=pagination)
     except Exception as e:
         return f"An error occurred: {str(e)}", 500
 
