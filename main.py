@@ -44,7 +44,20 @@ class Transaction(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 with app.app_context():
-    db.create_all()
+    db.drop_all()  # Clear all tables
+    db.create_all()  # Recreate tables
+    
+    # Check if admin user exists
+    if not User.query.filter_by(username='admin').first():
+        admin = User(username='admin', password='admin123', is_admin=True)
+        db.session.add(admin)
+    
+    # Check if regular user exists
+    if not User.query.filter_by(username='user').first():
+        user = User(username='user', password='user123', is_admin=False)
+        db.session.add(user)
+    
+    db.session.commit()
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
