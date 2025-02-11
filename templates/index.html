@@ -3,40 +3,117 @@
 <html>
 <head>
     <title>Simple Accounting App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        body { font-family: Arial; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .transaction { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
-        .income { background-color: #e6ffe6; }
-        .expense { background-color: #ffe6e6; }
-        .form { margin: 20px 0; }
-        .total { font-size: 1.2em; font-weight: bold; }
-        .date-filter { margin: 20px 0; padding: 10px; background: #f5f5f5; }
-        .date-filter input { margin-right: 10px; padding: 5px; }
-        .reset-btn { padding: 5px 10px; background: #ff9999; color: black; text-decoration: none; border-radius: 3px; }
-        .pagination { margin: 20px 0; text-align: center; }
-        .pagination a { padding: 5px 10px; margin: 0 5px; text-decoration: none; background: #f0f0f0; border-radius: 3px; }
-        .pagination span { margin: 0 10px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        h1 { color: #2d3748; }
+        .logout-btn {
+            padding: 8px 16px;
+            background: #ef4444;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        .logout-btn:hover { background: #dc2626; }
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+        }
+        .transaction { 
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        .income { background-color: #f0fdf4; border-left: 4px solid #22c55e; }
+        .expense { background-color: #fef2f2; border-left: 4px solid #ef4444; }
+        .form { display: grid; gap: 1rem; }
+        @media (min-width: 768px) {
+            .form { grid-template-columns: 1fr 1fr 1fr auto; }
+        }
+        input, select, button {
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        button { 
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background: #45a049; }
+        .total {
+            display: grid;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        @media (min-width: 768px) {
+            .total { grid-template-columns: repeat(3, 1fr); }
+        }
+        .total div {
+            padding: 1rem;
+            border-radius: 6px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .pagination a {
+            padding: 8px 16px;
+            text-decoration: none;
+            background: white;
+            border-radius: 6px;
+            color: #4CAF50;
+            transition: background 0.3s;
+        }
+        .pagination a:hover { background: #f0fdf4; }
     </style>
 </head>
 <body>
-    <div style="display: flex; justify-content: space-between; align-items: center;">
+    <div class="header">
         <h1>Accounting App</h1>
-        <a href="/logout" style="padding: 8px 16px; background: #ff6b6b; color: white; text-decoration: none; border-radius: 4px;">Logout</a>
+        <a href="/logout" class="logout-btn">Logout</a>
     </div>
     
-    <div class="date-filter">
+    <div class="card">
         <h3>Filter by Date</h3>
-        <form method="get">
-            <input type="date" name="start_date" value="{{ start_date }}" placeholder="Start Date">
-            <input type="date" name="end_date" value="{{ end_date }}" placeholder="End Date">
+        <form method="get" class="form" style="margin-top: 1rem;">
+            <input type="date" name="start_date" value="{{ start_date }}">
+            <input type="date" name="end_date" value="{{ end_date }}">
             <button type="submit">Filter</button>
-            <a href="/" class="reset-btn">Reset</a>
+            <a href="/" class="logout-btn" style="text-align: center">Reset</a>
         </form>
     </div>
 
-    <div class="form">
+    <div class="card">
         <h2>Add Transaction</h2>
-        <form action="/add" method="post">
+        <form action="/add" method="post" class="form" style="margin-top: 1rem;">
             <input type="text" name="description" placeholder="Description" required>
             <input type="number" name="amount" step="0.01" placeholder="Amount" required>
             <select name="type">
@@ -53,29 +130,28 @@
         <div>Total Balance: ৳{{ "%.2f"|format(total) }}</div>
     </div>
 
-    <h2>Transactions</h2>
-    {% for transaction in transactions %}
-    <div class="transaction {{ transaction.type }}">
-        <strong>{{ transaction.description }}</strong>
-        <br>
-        Amount: ৳{{ "%.2f"|format(transaction.amount) }}
-        <br>
-        Date: {{ transaction.date.strftime('%Y-%m-%d %H:%M') }}
-        <br>
-        Type: {{ transaction.type }}
-    </div>
-    {% endfor %}
+    <div class="card">
+        <h2>Transactions</h2>
+        {% for transaction in transactions %}
+        <div class="transaction {{ transaction.type }}">
+            <strong>{{ transaction.description }}</strong>
+            <div>Amount: ৳{{ "%.2f"|format(transaction.amount) }}</div>
+            <div>Date: {{ transaction.date.strftime('%Y-%m-%d %H:%M') }}</div>
+            <div>Type: {{ transaction.type }}</div>
+        </div>
+        {% endfor %}
 
-    <div class="pagination">
-        {% if pagination.has_prev %}
-            <a href="{{ url_for('index', page=pagination.prev_num, start_date=start_date, end_date=end_date) }}">&laquo; Previous</a>
-        {% endif %}
-        
-        <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
-        
-        {% if pagination.has_next %}
-            <a href="{{ url_for('index', page=pagination.next_num, start_date=start_date, end_date=end_date) }}">Next &raquo;</a>
-        {% endif %}
+        <div class="pagination">
+            {% if pagination.has_prev %}
+                <a href="{{ url_for('index', page=pagination.prev_num, start_date=start_date, end_date=end_date) }}">&laquo; Previous</a>
+            {% endif %}
+            
+            <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+            
+            {% if pagination.has_next %}
+                <a href="{{ url_for('index', page=pagination.next_num, start_date=start_date, end_date=end_date) }}">Next &raquo;</a>
+            {% endif %}
+        </div>
     </div>
 </body>
 </html>
