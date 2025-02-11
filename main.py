@@ -20,8 +20,11 @@ with app.app_context():
 @app.route('/')
 def index():
     transactions = Transaction.query.order_by(Transaction.date.desc()).all()
-    total = sum([t.amount if t.type == 'income' else -t.amount for t in transactions])
-    return render_template('index.html', transactions=transactions, total=total)
+    total_income = sum([t.amount for t in transactions if t.type == 'income'])
+    total_expense = sum([t.amount for t in transactions if t.type == 'expense'])
+    total = total_income - total_expense
+    return render_template('index.html', transactions=transactions, total=total, 
+                         total_income=total_income, total_expense=total_expense)
 
 @app.route('/add', methods=['POST'])
 def add_transaction():
