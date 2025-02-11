@@ -136,6 +136,12 @@
         <h2>Transactions</h2>
         {% for transaction in transactions %}
         <div class="transaction {{ transaction.type }}">
+            {% if current_user.is_admin %}
+            <div style="float: right">
+                <button onclick="editTransaction({{ transaction.id }}, '{{ transaction.description }}', {{ transaction.amount }}, '{{ transaction.type }}')" style="background: #3b82f6">Edit</button>
+                <a href="/delete/{{ transaction.id }}" onclick="return confirm('Are you sure you want to delete this transaction?')" style="background: #ef4444; padding: 10px; border-radius: 6px; color: white; text-decoration: none; display: inline-block;">Delete</a>
+            </div>
+            {% endif %}
             <strong>{{ transaction.description }}</strong>
             <div>Amount: ৳{{ "%.2f"|format(transaction.amount) }}</div>
             <div>Date: {{ transaction.date.strftime('%Y-%m-%d %H:%M') }}</div>
@@ -155,5 +161,38 @@
             {% endif %}
         </div>
     </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;">
+        <div class="card" style="width: 90%; max-width: 500px; margin: 20px;">
+            <h2>Edit Transaction</h2>
+            <form id="editForm" method="post" class="form" style="margin-top: 1rem;">
+                <input type="text" name="description" id="editDescription" required>
+                <input type="number" name="amount" id="editAmount" step="0.01" required>
+                <select name="type" id="editType">
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                </select>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit">Save</button>
+                    <button type="button" onclick="closeEditModal()" style="background: #6b7280">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function editTransaction(id, description, amount, type) {
+            document.getElementById('editModal').style.display = 'flex';
+            document.getElementById('editDescription').value = description;
+            document.getElementById('editAmount').value = amount;
+            document.getElementById('editType').value = type;
+            document.getElementById('editForm').action = '/edit/' + id;
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+    </script>
 </body>
 </html>

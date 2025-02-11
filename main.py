@@ -130,5 +130,23 @@ def add_transaction():
     
     return redirect(url_for('index'))
 
+@app.route('/edit/<int:id>', methods=['POST'])
+@admin_required
+def edit_transaction(id):
+    transaction = Transaction.query.get_or_404(id)
+    transaction.description = request.form['description']
+    transaction.amount = float(request.form['amount'])
+    transaction.type = request.form['type']
+    db.session.commit()
+    return redirect(url_for('index'))
+
+@app.route('/delete/<int:id>')
+@admin_required
+def delete_transaction(id):
+    transaction = Transaction.query.get_or_404(id)
+    db.session.delete(transaction)
+    db.session.commit()
+    return redirect(url_for('index'))
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=3000)
