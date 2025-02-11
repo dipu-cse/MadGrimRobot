@@ -117,6 +117,14 @@
     </div>
     {% endif %}
 
+    {% if session['user_id'] and current_user.is_admin %}
+    <div class="total">
+        <div>Total Income: ৳{{ "%.2f"|format(total_income) }}</div>
+        <div>Total Expenses: ৳{{ "%.2f"|format(total_expense) }}</div>
+        <div>Total Balance: ৳{{ "%.2f"|format(total) }}</div>
+    </div>
+    {% endif %}
+
     <div class="card">
         <h3>Filter by Date</h3>
         <form method="get" class="form" style="margin-top: 1rem;">
@@ -125,12 +133,6 @@
             <button type="submit">Filter</button>
             <a href="/" class="logout-btn" style="text-align: center">Reset</a>
         </form>
-    </div>
-
-    <div class="total">
-        <div>Total Income: ৳{{ "%.2f"|format(total_income) }}</div>
-        <div>Total Expenses: ৳{{ "%.2f"|format(total_expense) }}</div>
-        <div>Total Balance: ৳{{ "%.2f"|format(total) }}</div>
     </div>
 
     <div class="card">
