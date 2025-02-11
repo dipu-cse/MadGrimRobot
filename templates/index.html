@@ -111,6 +111,7 @@
         </form>
     </div>
 
+    {% if session['user_id'] and current_user.is_admin %}
     <div class="card">
         <h2>Add Transaction</h2>
         <form action="/add" method="post" class="form" style="margin-top: 1rem;">
@@ -123,6 +124,7 @@
             <button type="submit">Add</button>
         </form>
     </div>
+    {% endif %}
 
     <div class="total">
         <div>Total Income: ৳{{ "%.2f"|format(total_income) }}</div>

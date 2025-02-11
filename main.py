@@ -104,10 +104,11 @@ def index():
         total_expense = sum([t.amount for t in query.filter_by(type='expense').all()])
         total = total_income - total_expense
         
+        current_user = User.query.get(session['user_id'])
         return render_template('index.html', transactions=transactions, total=total,
                              total_income=total_income, total_expense=total_expense,
                              start_date=start_date, end_date=end_date,
-                             pagination=pagination)
+                             pagination=pagination, current_user=current_user)
     except Exception as e:
         return f"An error occurred: {str(e)}", 500
 
