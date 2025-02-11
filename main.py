@@ -49,11 +49,18 @@ with app.app_context():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = User.query.filter_by(username=request.form['username']).first()
-        if user and user.password == request.form['password']:  # In production, use proper password hashing
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if not username or not password:
+            flash('Username and password are required')
+            return render_template('login.html')
+            
+        user = User.query.filter_by(username=username).first()
+        if user and user.password == password:  # In production, use proper password hashing
             session['user_id'] = user.id
             return redirect(url_for('index'))
-        flash('Invalid credentials')
+        flash('Invalid username or password')
     return render_template('login.html')
 
 @app.route('/logout')
