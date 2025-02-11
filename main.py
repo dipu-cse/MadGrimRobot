@@ -19,12 +19,24 @@ with app.app_context():
 
 @app.route('/')
 def index():
-    transactions = Transaction.query.order_by(Transaction.date.desc()).all()
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+    
+    query = Transaction.query
+    
+    if start_date:
+        query = query.filter(Transaction.date >= datetime.strptime(start_date, '%Y-%m-%d'))
+    if end_date:
+        query = query.filter(Transaction.date <= datetime.strptime(end_date, '%Y-%m-%d') + datetime.timedelta(days=1))
+    
+    transactions = query.order_by(Transaction.date.desc()).all()
     total_income = sum([t.amount for t in transactions if t.type == 'income'])
     total_expense = sum([t.amount for t in transactions if t.type == 'expense'])
     total = total_income - total_expense
-    return render_template('index.html', transactions=transactions, total=total, 
-                         total_income=total_income, total_expense=total_expense)
+    
+    return render_template('index.html', transactions=transactions, total=total,
+                         total_income=total_income, total_expense=total_expense,
+                         start_date=start_date, end_date=end_date)
 
 @app.route('/add', methods=['POST'])
 def add_transaction():

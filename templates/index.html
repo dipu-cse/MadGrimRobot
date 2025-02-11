@@ -10,11 +10,24 @@
         .expense { background-color: #ffe6e6; }
         .form { margin: 20px 0; }
         .total { font-size: 1.2em; font-weight: bold; }
+        .date-filter { margin: 20px 0; padding: 10px; background: #f5f5f5; }
+        .date-filter input { margin-right: 10px; padding: 5px; }
+        .reset-btn { padding: 5px 10px; background: #ff9999; color: black; text-decoration: none; border-radius: 3px; }
     </style>
 </head>
 <body>
     <h1>Accounting App</h1>
     
+    <div class="date-filter">
+        <h3>Filter by Date</h3>
+        <form method="get">
+            <input type="date" name="start_date" value="{{ start_date }}" placeholder="Start Date">
+            <input type="date" name="end_date" value="{{ end_date }}" placeholder="End Date">
+            <button type="submit">Filter</button>
+            <a href="/" class="reset-btn">Reset</a>
+        </form>
+    </div>
+
     <div class="form">
         <h2>Add Transaction</h2>
         <form action="/add" method="post">
