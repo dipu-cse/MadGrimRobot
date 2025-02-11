@@ -19,24 +19,29 @@ with app.app_context():
 
 @app.route('/')
 def index():
-    start_date = request.args.get('start_date')
-    end_date = request.args.get('end_date')
-    
-    query = Transaction.query
-    
-    if start_date:
-        query = query.filter(Transaction.date >= datetime.strptime(start_date, '%Y-%m-%d'))
-    if end_date:
-        query = query.filter(Transaction.date <= datetime.strptime(end_date, '%Y-%m-%d') + datetime.timedelta(days=1))
-    
-    transactions = query.order_by(Transaction.date.desc()).all()
+    try:
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+        
+        query = Transaction.query
+        
+        if start_date and start_date.strip():
+            start_datetime = datetime.strptime(start_date, '%Y-%m-%d')
+            query = query.filter(Transaction.date >= start_datetime)
+        if end_date and end_date.strip():
+            end_datetime = datetime.strptime(end_date, '%Y-%m-%d')
+            query = query.filter(Transaction.date <= end_datetime + datetime.timedelta(days=1))
+        
+        transactions = query.order_by(Transaction.date.desc()).all()
     total_income = sum([t.amount for t in transactions if t.type == 'income'])
-    total_expense = sum([t.amount for t in transactions if t.type == 'expense'])
-    total = total_income - total_expense
-    
-    return render_template('index.html', transactions=transactions, total=total,
-                         total_income=total_income, total_expense=total_expense,
-                         start_date=start_date, end_date=end_date)
+        total_expense = sum([t.amount for t in transactions if t.type == 'expense'])
+        total = total_income - total_expense
+        
+        return render_template('index.html', transactions=transactions, total=total,
+                             total_income=total_income, total_expense=total_expense,
+                             start_date=start_date, end_date=end_date)
+    except Exception as e:
+        return f"An error occurred: {str(e)}", 500
 
 @app.route('/add', methods=['POST'])
 def add_transaction():
